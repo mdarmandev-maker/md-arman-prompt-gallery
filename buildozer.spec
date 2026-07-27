@@ -3,6 +3,7 @@
 title = AI Prompt Gallery
 orientation = portrait
 fullscreen = 0
+android.accept_sdk_license = True
 
 # (str) Package name
 package.name = aipromptgallery
