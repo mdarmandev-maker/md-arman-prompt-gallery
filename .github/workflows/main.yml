@@ -26,6 +26,9 @@ jobs:
 
       - name: 4. APK Banana
         run: |
+          # Pehle purana cache saaf karo
+          buildozer clean
+          # Ab build shuru karo
           yes | buildozer -v android debug
 
       - name: 5. APK ko Save karna
