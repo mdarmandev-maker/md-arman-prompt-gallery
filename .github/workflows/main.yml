@@ -21,27 +21,22 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y openjdk-17-jdk unzip wget
-          
-      - name: Download and install Android SDK command-line tools
-        run: |
-          mkdir -p $HOME/android-sdk
-          wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip
-          unzip -q cmdline-tools.zip -d $HOME/android-sdk
-          mkdir -p $HOME/android-sdk/cmdline-tools
-          mv $HOME/android-sdk/tools $HOME/android-sdk/cmdline-tools/latest
-          export ANDROID_SDK_ROOT=$HOME/android-sdk
-          export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin
-          
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v2
+        with:
+          api-level: 33
+          build-tools: 33.0.0
+          target: 'android-33'
+          architecture: 'arm64-v8a'
+
       - name: Accept SDK licenses
         run: yes | sdkmanager --licenses
-
-      - name: Install SDK packages
-        run: |
-          sdkmanager "platforms;android-33" "build-tools;33.0.0" "platforms;android-24" "build-tools;30.0.3"
 
       - name: Install Python dependencies
         run: |
