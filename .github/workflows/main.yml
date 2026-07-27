@@ -10,7 +10,8 @@ jobs:
       - name: Update and Install Dependencies
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
+          # libtinfo5 hata diya hai kyunki ye naye Ubuntu mein nahi hota
+          sudo apt-get install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libffi-dev libssl-dev cmake
           
       - name: Install Buildozer
         run: |
@@ -19,7 +20,6 @@ jobs:
           
       - name: Build APK
         run: |
-          # Buildozer ko path mein add karte hain
           export PATH=$PATH:$HOME/.local/bin
           buildozer -v android debug
           
