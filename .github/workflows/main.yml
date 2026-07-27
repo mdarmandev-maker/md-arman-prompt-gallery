@@ -1,4 +1,4 @@
-name: Build AI Prompt Gallery
+name: CI Build
 
 on:
   push:
@@ -13,34 +13,31 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
 
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y openjdk-17-jdk unzip wget git
-          
-          # Install Android SDK command line tools
-          wget https://dl.google.com/android/repository/commandlinetools-linux-8092744_latest.zip -O cmdline-tools.zip
-          mkdir -p $HOME/Android/cmdline-tools
-          unzip cmdline-tools.zip -d $HOME/Android/cmdline-tools
-          export ANDROID_SDK_ROOT=$HOME/Android
-          
-          # Install SDK components
-          yes | $ANDROID_SDK_ROOT/cmdline-tools/tools/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platforms;android-33" "build-tools;33.0.0" "ndk;25.2.9519653" "platform-tools"
-          
-          # Set environment variables
-          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
-          echo "ANDROID_NDK=$ANDROID_SDK_ROOT/ndk/25.2.9519653" >> $GITHUB_ENV
-          
-          # Install Python dependencies
-          pip install --upgrade pip
-          pip install buildozer
+          sudo apt-get install -y python3 python3-pip openjdk-11-jdk
 
-      - name: Build APK
+      - name: Install build tools
         run: |
+          pip3 install --upgrade buildozer
+
+      - name: Verify installations
+        run: |
+          which python3
+          which pip3
+          which java
+          which buildozer
+
+      - name: Run your build command
+        run: |
+          # Replace this with your actual build command
           buildozer android debug
-        env:
-          ANDROIDSDK: ${{ env.ANDROID_SDK_ROOT }}
-          ANDROIDNDK: ${{ env.ANDROID_NDK }}
