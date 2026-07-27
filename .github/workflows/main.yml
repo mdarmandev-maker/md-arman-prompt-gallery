@@ -1,48 +1,76 @@
-name: Build Kivy App to APK
+name: Ai Prompt Gallery
 
 on:
-push:
-branches: [ main ]
-workflow_dispatch:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch: # Allows manual trigger from GitHub UI
 
 jobs:
-build:
-runs-on: ubuntu-22.04
+  build:
+    runs-on: ubuntu-22.04
 
-steps:
-- name: Checkout Code
-  uses: actions/checkout@v4
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
 
-- name: Set up Python
-  uses: actions/setup-python@v5
-  with:
-    python-version: '3.10'
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
 
-- name: Install System Dependencies
-  run: |
-    sudo apt-get update
-    sudo apt-get install -y \
-      build-essential git ffmpeg libsdl2-dev libsdl2-image-dev \
-      libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev \
-      libavformat-dev libavcodec-dev zlib1g-dev openjdk-17-jdk \
-      unzip zip libgstreamer1.0-dev gstreamer1.0-plugins-base \
-      gstreamer1.0-plugins-good libsqlite3-dev sqlite3 bzip2 \
-      libbz2-dev libssl-dev openssl libgdbm-dev libgdbm-compat-dev \
-      liblzma-dev libreadline-dev uuid-dev libffi-dev ccache
+    - name: Install System Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          build-essential \
+          git \
+          ffmpeg \
+          libsdl2-dev \
+          libsdl2-image-dev \
+          libsdl2-mixer-dev \
+          libsdl2-ttf-dev \
+          libportmidi-dev \
+          libswscale-dev \
+          libavformat-dev \
+          libavcodec-dev \
+          zlib1g-dev \
+          openjdk-17-jdk \
+          unzip \
+          zip \
+          libgstreamer1.0-dev \
+          gstreamer1.0-plugins-base \
+          gstreamer1.0-plugins-good \
+          libsqlite3-dev \
+          sqlite3 \
+          bzip2 \
+          libbz2-dev \
+          libssl-dev \
+          openssl \
+          libgdbm-dev \
+          libgdbm-compat-dev \
+          liblzma-dev \
+          libreadline-dev \
+          uuid-dev \
+          libffi-dev \
+          ccache
 
-- name: Install Buildozer and Cython
-  run: |
-    pip install --upgrade pip
-    pip install Cython==0.29.33 buildozer virtualenv
+    - name: Install Buildozer and Cython
+      run: |
+        pip install --upgrade pip
+        pip install Cython==0.29.33 buildozer virtualenv
 
-- name: Build APK with Buildozer
-  run: |
-    yes | buildozer -v android debug
-  env:
-    USE_CCACHE: 1
+    - name: Build APK with Buildozer
+      run: |
+        # Accept Android SDK licenses automatically
+        yes | buildozer android debug
+      env:
+        # Use ccache to speed up successive builds if caching is enabled
+        USE_CCACHE: 1
 
-- name: Upload APK Artifact
-  uses: actions/upload-artifact@v4
-  with:
-    name: AI-Prompt-Gallery-APK
-    path: bin/*.apk
+    - name: Upload APK Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: kivy-android-apk
+        path: bin/*.apk
