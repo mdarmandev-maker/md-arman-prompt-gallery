@@ -11,9 +11,40 @@ from kivy.animation import Animation
 from kivy.properties import ListProperty, NumericProperty
 from kivy.uix.widget import Widget
 from kivy.metrics import dp
+from kivy.utils import platform
 from collections import Counter
 import random
 import webbrowser
+
+
+def open_link(url):
+    """
+    Cross-platform-safe link opener.
+
+    Python ka standard 'webbrowser' module Android par kaam NAHI karta
+    (wahan koi desktop-style browser subprocess hota hi nahi - button
+    dabane par chup-chaap kuch nahi hota). Android par isliye Android
+    ka apna native Intent (pyjnius ke through) use karte hain, jo
+    device ke default browser ko seedha khol deta hai. Desktop/testing
+    ke liye normal webbrowser.open() hi chalta hai, jaisa pehle tha.
+    """
+    if platform == "android":
+        try:
+            from jnius import autoclass, cast
+
+            Intent = autoclass("android.content.Intent")
+            Uri = autoclass("android.net.Uri")
+            PythonActivity = autoclass("org.kivy.android.PythonActivity")
+
+            intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            current_activity = cast("android.app.Activity", PythonActivity.mActivity)
+            current_activity.startActivity(intent)
+        except Exception:
+            # Kabhi bhi kuch galat ho (jaise koi purana/anya Android
+            # activity class), app crash na ho - chup-chaap fail ho jaye
+            pass
+    else:
+        webbrowser.open(url)
 
 Builder.load_string('''
 <AmbientGradientBG>:
@@ -274,7 +305,7 @@ class MainScreen(MDScreen):
         self._open_custom_dialog("Contact Details", text, show_portfolio_btn=True)
 
     def open_portfolio(self):
-        webbrowser.open("https://md-arman.lovable.app")
+        open_link("https://md-arman.lovable.app")
         if self.dialog:
             self.dialog.dismiss()
 
@@ -297,7 +328,7 @@ class MainScreen(MDScreen):
         self._open_custom_dialog("Terms of Use", text)
 
     def open_url(self, url):
-        webbrowser.open(url)
+        open_link(url)
         if self.dialog:
             self.dialog.dismiss()
 
